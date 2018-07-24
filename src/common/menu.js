@@ -23,6 +23,21 @@ const menuData = [
     ],
   },
   {
+    name: 'Asset',
+    icon: 'dashboard',
+    path: 'asset',
+    children: [
+      {
+        name: 'Software Asset',
+        path: 'softwareAssetList',
+      },
+      {
+        name: 'Hardware Asset',
+        path: 'hardwareAssetList',
+      },
+    ],
+  },
+  {
     name: '表单页',
     icon: 'form',
     path: 'form',

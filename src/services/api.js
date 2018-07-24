@@ -1,6 +1,15 @@
 import { stringify } from 'qs';
 import request from '../utils/request';
 
+export async function querySoftwareAssetList(params) {
+  console.log("in querySoftwareAssetList...")
+  const result = request(`/api/getSoftwareAssetList?${stringify(params)}`);
+  console.log(".............")
+  return result
+}
+
+
+
 export async function queryProjectNotice() {
   return request('/api/project/notice');
 }

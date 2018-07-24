@@ -88,6 +88,19 @@ export const getRouterData = app => {
       // name: '工作台',
       // authority: 'admin',
     },
+
+    '/asset/softwareAssetList': {
+      component: dynamicWrapper(app, ['softwareAsset'], () => import('../routes/Asset/SoftwareAssetList')),
+    },
+    '/asset/newSoftwareAsset': {
+      component: dynamicWrapper(app, ['softwareAssetDetail'], () => import('../routes/Asset/NewSoftwareAsset')),
+    },
+    '/asset/hardwareAssetList': {
+      component: dynamicWrapper(app, ['hardwareAsset'], () => import('../routes/Asset/HardwareAssetList')),
+    },
+
+
+
     '/form/basic-form': {
       component: dynamicWrapper(app, ['form'], () => import('../routes/Forms/BasicForm')),
     },

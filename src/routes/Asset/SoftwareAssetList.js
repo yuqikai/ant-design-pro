@@ -21,8 +21,8 @@ import {
 } from 'antd';
 import StandardTable from 'components/StandardTable';
 import PageHeaderLayout from '../../layouts/PageHeaderLayout';
-
-import styles from './TableList.less';
+import { Link } from 'dva/router';
+import styles from './SoftwareAssetList.less';
 
 const FormItem = Form.Item;
 const { Option } = Select;
@@ -58,12 +58,12 @@ const CreateForm = Form.create()(props => {
   );
 });
 
-@connect(({ rule, loading }) => ({
-  rule,
-  loading: loading.models.rule,
+@connect(({ softwareAsset, loading }) => ({
+  softwareAsset,
+  loading: loading.models.softwareAsset,
 }))
 @Form.create()
-export default class TableList extends PureComponent {
+export default class SoftwareAssetList extends PureComponent {
   state = {
     modalVisible: false,
     expandForm: false,
@@ -74,7 +74,7 @@ export default class TableList extends PureComponent {
   componentDidMount() {
     const { dispatch } = this.props;
     dispatch({
-      type: 'rule/fetch',
+      type: 'softwareAsset/fetch',
     });
   }
 
@@ -99,19 +99,20 @@ export default class TableList extends PureComponent {
     }
 
     dispatch({
-      type: 'rule/fetch',
+      type: 'softwareAsset/fetch',
       payload: params,
     });
   };
 
   handleFormReset = () => {
     const { form, dispatch } = this.props;
+    console.log(form.getFieldsValue())
     form.resetFields();
     this.setState({
       formValues: {},
     });
     dispatch({
-      type: 'rule/fetch',
+      type: 'softwareAsset/fetch',
       payload: {},
     });
   };
@@ -121,31 +122,6 @@ export default class TableList extends PureComponent {
     this.setState({
       expandForm: !expandForm,
     });
-  };
-
-  handleMenuClick = e => {
-    const { dispatch } = this.props;
-    const { selectedRows } = this.state;
-
-    if (!selectedRows) return;
-
-    switch (e.key) {
-      case 'remove':
-        dispatch({
-          type: 'rule/remove',
-          payload: {
-            no: selectedRows.map(row => row.no).join(','),
-          },
-          callback: () => {
-            this.setState({
-              selectedRows: [],
-            });
-          },
-        });
-        break;
-      default:
-        break;
-    }
   };
 
   handleSelectRows = rows => {
@@ -172,7 +148,7 @@ export default class TableList extends PureComponent {
       });
 
       dispatch({
-        type: 'rule/fetch',
+        type: 'softwareAsset/fetch',
         payload: values,
       });
     });
@@ -206,27 +182,22 @@ export default class TableList extends PureComponent {
       <Form onSubmit={this.handleSearch} layout="inline">
         <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
           <Col md={8} sm={24}>
-            <FormItem label="规则编号">
-              {getFieldDecorator('no')(<Input placeholder="请输入" />)}
+            <FormItem label="Asset Id">
+              {getFieldDecorator('assetId')(<Input placeholder="please input" />)}
             </FormItem>
           </Col>
           <Col md={8} sm={24}>
-            <FormItem label="使用状态">
-              {getFieldDecorator('status')(
-                <Select placeholder="请选择" style={{ width: '100%' }}>
-                  <Option value="0">关闭</Option>
-                  <Option value="1">运行中</Option>
-                </Select>
-              )}
+            <FormItem label="Asset Name">
+              {getFieldDecorator('assetName')(<Input placeholder="please input" />)}
             </FormItem>
           </Col>
           <Col md={8} sm={24}>
             <span className={styles.submitButtons}>
               <Button type="primary" htmlType="submit">
-                查询
+                Query
               </Button>
               <Button style={{ marginLeft: 8 }} onClick={this.handleFormReset}>
-                重置
+                Reset
               </Button>
               <a style={{ marginLeft: 8 }} onClick={this.toggleForm}>
                 展开 <Icon type="down" />
@@ -245,62 +216,83 @@ export default class TableList extends PureComponent {
       <Form onSubmit={this.handleSearch} layout="inline">
         <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
           <Col md={8} sm={24}>
-            <FormItem label="规则编号">
-              {getFieldDecorator('no')(<Input placeholder="请输入" />)}
+            <FormItem label="Asset Id">
+              {getFieldDecorator('assetId')(<Input placeholder="please input" />)}
             </FormItem>
           </Col>
           <Col md={8} sm={24}>
-            <FormItem label="使用状态">
-              {getFieldDecorator('status')(
-                <Select placeholder="请选择" style={{ width: '100%' }}>
-                  <Option value="0">关闭</Option>
-                  <Option value="1">运行中</Option>
+            <FormItem label="Asset Name">
+              {getFieldDecorator('assetName')(<Input placeholder="please input" />)}
+            </FormItem>
+          </Col>
+          <Col md={8} sm={24}>
+            <FormItem label="Bu Org">
+              {getFieldDecorator('buId')(
+                <Select placeholder="please choose" style={{ width: '100%' }}>
+                  <Option value="it">IT</Option>
+                  <Option value="admin">Admin</Option>
+                  <Option value="eqst">EQST</Option>
+                  <Option value="mas">FI</Option>
                 </Select>
               )}
-            </FormItem>
-          </Col>
-          <Col md={8} sm={24}>
-            <FormItem label="调用次数">
-              {getFieldDecorator('number')(<InputNumber style={{ width: '100%' }} />)}
             </FormItem>
           </Col>
         </Row>
         <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
           <Col md={8} sm={24}>
-            <FormItem label="更新日期">
-              {getFieldDecorator('date')(
-                <DatePicker style={{ width: '100%' }} placeholder="请输入更新日期" />
-              )}
+            <FormItem label="User Name">
+              {getFieldDecorator('userName')(<Input placeholder="please input" />)}
             </FormItem>
           </Col>
-          <Col md={8} sm={24}>
-            <FormItem label="使用状态">
-              {getFieldDecorator('status3')(
-                <Select placeholder="请选择" style={{ width: '100%' }}>
-                  <Option value="0">关闭</Option>
-                  <Option value="1">运行中</Option>
-                </Select>
+          <Col md={16} sm={48}>
+            <FormItem label="Prod Date">
+              {getFieldDecorator('prodStartDate')(
+                <DatePicker style={{ width: '30%' }} placeholder="Please choose start date" />
+              )}
+              {getFieldDecorator('prodEndDate')(
+                <DatePicker style={{ width: '30%' }} placeholder="Please choose end date" />
               )}
             </FormItem>
-          </Col>
-          <Col md={8} sm={24}>
-            <FormItem label="使用状态">
-              {getFieldDecorator('status4')(
-                <Select placeholder="请选择" style={{ width: '100%' }}>
-                  <Option value="0">关闭</Option>
-                  <Option value="1">运行中</Option>
-                </Select>
-              )}
-            </FormItem>
+
           </Col>
         </Row>
+
+        <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
+          <Col md={8} sm={24}>
+            <FormItem label="Life Cycle Phase">
+              {getFieldDecorator('lifeCyclePhase')(
+                <Select placeholder="please choose" style={{ width: '100%' }}>
+                  <Option value="it">IT</Option>
+                  <Option value="admin">Admin</Option>
+                  <Option value="eqst">EQST</Option>
+                  <Option value="mas">FI</Option>
+                </Select>
+              )}
+            </FormItem>
+          </Col>
+          <Col md={8} sm={24}>
+            <FormItem label="SDLC Phase">
+              {getFieldDecorator('sdlcPhase')(
+                <Select placeholder="please choose" style={{ width: '100%' }}>
+                  <Option value="it">IT</Option>
+                  <Option value="admin">Admin</Option>
+                  <Option value="eqst">EQST</Option>
+                  <Option value="mas">FI</Option>
+                </Select>
+              )}
+            </FormItem>
+          </Col>
+          <Col md={8} sm={24}>
+          </Col>
+        </Row>
+
         <div style={{ overflow: 'hidden' }}>
           <span style={{ float: 'right', marginBottom: 24 }}>
             <Button type="primary" htmlType="submit">
-              查询
+              Query
             </Button>
             <Button style={{ marginLeft: 8 }} onClick={this.handleFormReset}>
-              重置
+              Reset
             </Button>
             <a style={{ marginLeft: 8 }} onClick={this.toggleForm}>
               收起 <Icon type="up" />
@@ -318,105 +310,75 @@ export default class TableList extends PureComponent {
 
   render() {
     const {
-      rule: { data },
+      softwareAsset: { data },
       loading,
     } = this.props;
-    const { selectedRows, modalVisible } = this.state;
 
-    console.log(loading)
-    console.log(data)
+    const { selectedRows, modalVisible } = this.state;
 
     const columns = [
       {
-        title: '规则编号',
-        dataIndex: 'no',
+        title: 'Asset Name',
+        dataIndex: 'assetId',
       },
       {
-        title: '描述',
-        dataIndex: 'description',
+        title: 'Asset Sub Cls',
+        dataIndex: 'assetSubCls',
       },
       {
-        title: '服务调用次数',
-        dataIndex: 'callNo',
-        sorter: true,
-        align: 'right',
-        render: val => `${val} 万`,
-        // mark to display a total number
-        needTotal: true,
+        title: 'Asset Name',
+        dataIndex: 'assetName',
       },
       {
-        title: '状态',
-        dataIndex: 'status',
-        filters: [
-          {
-            text: status[0],
-            value: 0,
-          },
-          {
-            text: status[1],
-            value: 1,
-          },
-          {
-            text: status[2],
-            value: 2,
-          },
-          {
-            text: status[3],
-            value: 3,
-          },
-        ],
-        onFilter: (value, record) => record.status.toString() === value,
-        render(val) {
-          return <Badge status={statusMap[val]} text={status[val]} />;
-        },
+        title: 'Vendor Name',
+        dataIndex: 'vendorName',
       },
       {
-        title: '更新时间',
-        dataIndex: 'updatedAt',
-        sorter: true,
-        render: val => <span>{moment(val).format('YYYY-MM-DD HH:mm:ss')}</span>,
+        title: 'Primary Tech Owner',
+        dataIndex: 'primaryTechOwner',
       },
       {
-        title: '操作',
+        title: 'Actual Cost',
+        dataIndex: 'actualCost',
+      },
+      {
+        title: 'Action',
         render: () => (
           <Fragment>
-            <a href="">配置</a>
+            <a href="">Detail</a>
             <Divider type="vertical" />
-            <a href="">订阅警报</a>
+            <a href="">Edit</a>
+            <Divider type="vertical" />
+            <a href="">Clone</a>
+            <Divider type="vertical" />
+            <a href="">Delete</a>
           </Fragment>
         ),
       },
     ];
-
-    const menu = (
-      <Menu onClick={this.handleMenuClick} selectedKeys={[]}>
-        <Menu.Item key="remove">删除</Menu.Item>
-        <Menu.Item key="approval">批量审批</Menu.Item>
-      </Menu>
-    );
 
     const parentMethods = {
       handleAdd: this.handleAdd,
       handleModalVisible: this.handleModalVisible,
     };
 
+    const newSoftwareAssetPath = "/asset/newSoftwareAsset"
+
     return (
-      <PageHeaderLayout title="查询表格">
+      <PageHeaderLayout title="Software Asset Query">
         <Card bordered={false}>
           <div className={styles.tableList}>
             <div className={styles.tableListForm}>{this.renderForm()}</div>
             <div className={styles.tableListOperator}>
-              <Button icon="plus" type="primary" onClick={() => this.handleModalVisible(true)}>
-                新建
-              </Button>
+              <Link to={newSoftwareAssetPath}>
+                <Button icon="plus" type="primary">
+                  New Asset
+                </Button>
+              </Link>
+
               {selectedRows.length > 0 && (
                 <span>
-                  <Button>批量操作</Button>
-                  <Dropdown overlay={menu}>
-                    <Button>
-                      更多操作 <Icon type="down" />
-                    </Button>
-                  </Dropdown>
+                  <Button>Batch Delete</Button>
                 </span>
               )}
             </div>

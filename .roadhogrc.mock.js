@@ -1,6 +1,7 @@
 import mockjs from 'mockjs';
 import { getRule, postRule } from './mock/rule';
 import { getActivities, getNotice, getFakeList } from './mock/api';
+import { getSoftwareAssets } from './mock/tai_api';
 import { getFakeChartData } from './mock/chart';
 import { getProfileBasicData } from './mock/profile';
 import { getProfileAdvancedData } from './mock/profile';
@@ -12,6 +13,8 @@ const noProxy = process.env.NO_PROXY === 'true';
 
 // 代码中会兼容本地 service mock 以及部署站点的静态数据
 const proxy = {
+  'GET /api/getSoftwareAssetList': getSoftwareAssets,
+  'POST /api/getSoftwareAssetList': getSoftwareAssets,
   // 支持值为 Object 和 Array
   'GET /api/currentUser': {
     $desc: '获取当前用户接口',
